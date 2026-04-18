@@ -7,27 +7,23 @@ import '../../core/constants.dart';
 
 /// 大模型后端接口客户端
 class ApiClient {
-  // 配置 Dio 实例，大模型推理时间较长，必须设置较长的接收超时时间
   static final Dio _dio = Dio(
     BaseOptions(
-      connectTimeout: const Duration(seconds: 15), // 连接超时：15秒
-      receiveTimeout: const Duration(seconds: 60), // 接收超时：60秒
+      connectTimeout: const Duration(seconds: 15),
+      receiveTimeout: const Duration(seconds: 60),
     ),
   );
 
-  // ==========================================
-  // 1. 请求草业大模型推理接口
-  // ==========================================
+
+  // 请求草业大模型推理接口
   /// [prompt] 前端组装好的富文本 Prompt (包含本地状态、天气、用户问题)
   /// [imagePath] 用户拍摄的照片本地路径 (可选)
   static Future<String?> askAgent(String prompt, {String? imagePath}) async {
     try {
-      // 1. 构建 multipart/form-data 表单数据
       final Map<String, dynamic> dataMap = {
         "prompt": prompt,
       };
 
-      // 2. 如果存在图片，将其转换为流文件加入表单
       if (imagePath != null && imagePath.isNotEmpty) {
         final file = File(imagePath);
         if (await file.exists()) {
@@ -40,16 +36,13 @@ class ApiClient {
 
       final formData = FormData.fromMap(dataMap);
 
-      // 3. 发送 POST 请求到后端的 /ask 接口
       final response = await _dio.post(
         AppConstants.askApiUrl,
         data: formData,
       );
 
-      // 4. 解析后端返回结果
       if (response.statusCode == 200) {
         final responseData = response.data;
-        // 对应您设计的 FastAPI 返回格式: {"status": "success", "answer": "..."}
         if (responseData['status'] == 'success') {
           return responseData['answer'];
         } else {
@@ -67,6 +60,6 @@ class ApiClient {
       debugPrint("请求大模型未知错误: $e");
     }
 
-    return null; // 请求失败返回 null
+    return null;
   }
 }

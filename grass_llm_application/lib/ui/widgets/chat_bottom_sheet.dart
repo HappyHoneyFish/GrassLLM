@@ -3,7 +3,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../core/constants.dart';
 import '../../providers/chat_provider.dart';
 import '../../providers/user_provider.dart';
@@ -26,7 +25,6 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
     super.dispose();
   }
 
-  // 监听到新消息时，自动滚动到最底部
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
       Future.delayed(const Duration(milliseconds: 100), () {
@@ -45,31 +43,26 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
     final userProvider = context.read<UserProvider>();
     final timelineProvider = context.read<TimelineProvider>();
 
-    // 每次构建检查是否需要滚动到底部
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
 
-    // 让弹窗高度占据屏幕的 85%
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Container(
       height: screenHeight * 0.85,
       decoration: const BoxDecoration(
-        color: AppConstants.backgroundColor, // 使用全局底色
+        color: AppConstants.backgroundColor,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
         children: [
-          // 1. 顶部拖拽指示器与标题
           _buildHeader(context),
 
-          // 2. 聊天消息流
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
               padding: const EdgeInsets.all(AppConstants.defaultPadding),
               itemCount: chatProvider.messages.length + (chatProvider.isLoading ? 1 : 0),
               itemBuilder: (context, index) {
-                // 如果正在加载且是最后一项，显示"AI思考中"组件
                 if (chatProvider.isLoading && index == chatProvider.messages.length) {
                   return _buildLoadingBubble();
                 }
@@ -79,20 +72,15 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
             ),
           ),
 
-          // 3. 当前挂载的照片预览 (如果有)
           if (chatProvider.currentImagePath != null)
             _buildImagePreview(chatProvider),
 
-          // 4. 底部多模态交互操作区 (拍照 + 按住说话)
           _buildInputArea(context, chatProvider, userProvider, timelineProvider),
         ],
       ),
     );
   }
 
-  // ==========================================
-  // 子组件：头部指示器
-  // ==========================================
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -121,9 +109,6 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
     );
   }
 
-  // ==========================================
-  // 子组件：照片预览区域
-  // ==========================================
   Widget _buildImagePreview(ChatProvider chatProvider) {
     return Container(
       color: Colors.white,
@@ -158,9 +143,6 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
     );
   }
 
-  // ==========================================
-  // 子组件：底部操作区 (按住说话)
-  // ==========================================
   Widget _buildInputArea(
       BuildContext context,
       ChatProvider chatProvider,
@@ -179,14 +161,12 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
       ),
       child: Row(
         children: [
-          // 拍照按钮
           IconButton(
             onPressed: chatProvider.isLoading ? null : chatProvider.takePhoto,
             icon: Icon(Icons.camera_alt_outlined, color: chatProvider.isLoading ? Colors.grey : AppConstants.textSecondaryColor, size: 28),
           ),
           const SizedBox(width: 8),
 
-          // 按住说话按钮 (核心交互)
           Expanded(
             child: GestureDetector(
               onLongPressDown: (_) async {
@@ -228,9 +208,6 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
     );
   }
 
-  // ==========================================
-  // 子组件：聊天气泡
-  // ==========================================
   Widget _buildMessageBubble(ChatMessage message) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -238,7 +215,6 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
         mainAxisAlignment: message.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // AI 头像
           if (!message.isUser) ...[
             const CircleAvatar(
               backgroundColor: AppConstants.primaryLightColor,
@@ -247,7 +223,6 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
             const SizedBox(width: 8),
           ],
 
-          // 气泡主体
           Flexible(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -262,7 +237,6 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 如果带有照片，先显示照片
                   if (message.imagePath != null) ...[
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8),
@@ -274,7 +248,6 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
                     ),
                     const SizedBox(height: 8),
                   ],
-                  // 文本内容
                   Text(
                     message.text,
                     style: TextStyle(
@@ -288,16 +261,12 @@ class _ChatBottomSheetState extends State<ChatBottomSheet> {
             ),
           ),
 
-          // 占位，确保气泡不过长
           if (message.isUser) const SizedBox(width: 48) else const SizedBox(width: 48),
         ],
       ),
     );
   }
 
-  // ==========================================
-  // 子组件：AI 思考中
-  // ==========================================
   Widget _buildLoadingBubble() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,

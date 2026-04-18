@@ -13,9 +13,7 @@ class TimelineProvider with ChangeNotifier {
   List<TimelineEvent> get events => _events;
   bool get isLoadingWeather => _isLoadingWeather;
 
-  // ==========================================
-  // 1. 基于用户档案生成动态时间轴
-  // ==========================================
+
   void generateTimeline(UserProfile profile) {
     if (!profile.hasPlanted) {
       // 未种草状态的引导时间轴
@@ -36,12 +34,12 @@ class TimelineProvider with ChangeNotifier {
       return;
     }
 
-    // 已种草状态，基于时间推演
+
     final int days = profile.plantedDays;
     final double expectedYield = GrassCalculator.calculateExpectedYield(profile);
     final int sheepUnits = GrassCalculator.calculateSheepUnits(profile);
 
-    // 构建四个核心阶段的瀑布流数据
+
     _events = [
       TimelineEvent(
         title: "选种与播种",
@@ -67,22 +65,17 @@ class TimelineProvider with ChangeNotifier {
 
     notifyListeners();
 
-    // 2. 异步获取天气数据，并追加到当前进行中的阶段
+
     _fetchAndInjectWeather(profile);
   }
 
-  // ==========================================
-  // 2. 判断各个阶段的状态
-  // ==========================================
   EventStatus _determineStatus(int currentDays, int startDay, int endDay) {
     if (currentDays < startDay) return EventStatus.future;
     if (currentDays > endDay) return EventStatus.past;
-    return EventStatus.current; // 恰好处于该区间
+    return EventStatus.current;
   }
 
-  // ==========================================
-  // 3. 异步拉取天气并更新当前卡片
-  // ==========================================
+
   Future<void> _fetchAndInjectWeather(UserProfile profile) async {
     // 这里暂时使用默认的经纬度进行演示（如：甘肃酒泉大致坐标）
     // 实际生产中可通过定位插件获取真实坐标传入
@@ -92,7 +85,6 @@ class TimelineProvider with ChangeNotifier {
     final String weatherStr = await WeatherService.getTodayWeatherOverview(lat: 39.73, lng: 98.48);
 
     if (weatherStr.isNotEmpty) {
-      // 找到当前正在进行中的阶段，注入动态气象提醒
       for (int i = 0; i < _events.length; i++) {
         if (_events[i].status == EventStatus.current) {
           _events[i] = TimelineEvent(
@@ -101,7 +93,7 @@ class TimelineProvider with ChangeNotifier {
             status: _events[i].status,
             dynamicTip: "气象贴士：$weatherStr",
           );
-          break; // 只更新当前的高亮节点
+          break;
         }
       }
     }

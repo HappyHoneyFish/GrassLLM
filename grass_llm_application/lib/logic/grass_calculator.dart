@@ -2,12 +2,9 @@
 
 import '../data/models.dart';
 
-/// 草业本地轻量级计算器 (业务逻辑层)
+/// 草业本地轻量级计算器
 class GrassCalculator {
 
-  // ==========================================
-  // 1. 推演当前生长阶段
-  // ==========================================
   static String getCurrentStage(UserProfile profile) {
     if (!profile.hasPlanted || profile.plantDate == null) {
       return "尚未种植";
@@ -33,15 +30,15 @@ class GrassCalculator {
       return "完熟期";
     }
 
-    // 通用兜底逻辑
+    //通用
     if (days < 30) return "苗期阶段";
     if (days < 60) return "旺盛生长期";
     return "成熟收获期";
   }
 
-  // ==========================================
-  // 2. 估算预期干草产量 (单位：公斤)
-  // ==========================================
+
+  //估算预期干草产量
+
   static double calculateExpectedYield(UserProfile profile) {
     if (profile.area == null || profile.area! <= 0) return 0.0;
 
@@ -60,9 +57,8 @@ class GrassCalculator {
     return profile.area! * yieldPerMu;
   }
 
-  // ==========================================
-  // 3. 估算载畜量 (能养多少只标准羊单位)
-  // ==========================================
+
+  //估算载畜量 (能养多少只标准羊单位)
   /// 假设一只标准羊 (50kg) 每天需要吃约 1.5kg 干草
   /// 每年舍饲按 180 天计算
   static int calculateSheepUnits(UserProfile profile) {

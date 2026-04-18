@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-
 import '../../core/constants.dart';
 import '../../core/utils.dart';
 import '../../data/models.dart';
@@ -19,10 +18,8 @@ class InitScreen extends StatefulWidget {
 }
 
 class _InitScreenState extends State<InitScreen> {
-  // 0 = 未选择分支， 1 = 已种草 (分支A)， 2 = 未种草 (分支B)
   int _currentStep = 0;
 
-  // 表单控制器
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _grassTypeController = TextEditingController();
   final TextEditingController _areaController = TextEditingController();
@@ -36,11 +33,8 @@ class _InitScreenState extends State<InitScreen> {
     super.dispose();
   }
 
-  // ==========================================
-  // 核心逻辑：保存档案并跳转主页
-  // ==========================================
   Future<void> _submitProfile() async {
-    // 基础校验
+
     if (_locationController.text.trim().isEmpty || _areaController.text.trim().isEmpty) {
       AppUtils.showToast(context, "请填写完整基本信息", isError: true);
       return;
@@ -63,7 +57,6 @@ class _InitScreenState extends State<InitScreen> {
       return;
     }
 
-    // 构建用户档案
     final UserProfile profile = UserProfile(
       hasPlanted: hasPlanted,
       location: _locationController.text.trim(),
@@ -72,11 +65,9 @@ class _InitScreenState extends State<InitScreen> {
       plantDate: hasPlanted ? _selectedDate : null,
     );
 
-    // 存入本地并更新全局状态
     final success = await context.read<UserProvider>().updateProfile(profile);
 
     if (success && mounted) {
-      // 跃迁至主页
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
@@ -85,9 +76,6 @@ class _InitScreenState extends State<InitScreen> {
     }
   }
 
-  // ==========================================
-  // UI 渲染方法
-  // ==========================================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,7 +97,6 @@ class _InitScreenState extends State<InitScreen> {
     );
   }
 
-  // 1. 分支选择 UI
   Widget _buildBranchSelection() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -186,7 +173,6 @@ class _InitScreenState extends State<InitScreen> {
     );
   }
 
-  // 2. 极简表单 UI
   Widget _buildForm() {
     final isPlanted = _currentStep == 1;
     return SingleChildScrollView(
@@ -215,7 +201,6 @@ class _InitScreenState extends State<InitScreen> {
             _buildTextField(label: "种植什么草", hint: "例如：紫花苜蓿 / 燕麦", controller: _grassTypeController, icon: Icons.grass_outlined),
             const SizedBox(height: 20),
 
-            // 日期选择器
             GestureDetector(
               onTap: () async {
                 final date = await showDatePicker(
@@ -267,7 +252,6 @@ class _InitScreenState extends State<InitScreen> {
     );
   }
 
-  // 提取输入框组件
   Widget _buildTextField({required String label, required String hint, required TextEditingController controller, required IconData icon, bool isNumber = false}) {
     return TextField(
       controller: controller,

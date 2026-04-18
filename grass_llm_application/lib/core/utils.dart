@@ -10,9 +10,7 @@ import 'constants.dart';
 /// 全局通用工具类
 class AppUtils {
 
-  // ==========================================
-  // 1. 硬件权限申请 (麦克风与相机)
-  // ==========================================
+  // 硬件权限申请，麦克风与相机
   static Future<bool> requestMediaPermissions() async {
     Map<Permission, PermissionStatus> statuses = await [
       Permission.microphone,
@@ -24,10 +22,7 @@ class AppUtils {
         statuses[Permission.camera] == PermissionStatus.granted;
   }
 
-  // ==========================================
-  // 2. 文件转 Base64 编码
-  // (专用于百度短语音 API 音频上传及大模型图片上传)
-  // ==========================================
+  //文件转Base64编码，用于百度短语音API音频上传及大模型图片上传
   static Future<String?> encodeFileToBase64(String filePath) async {
     try {
       final file = File(filePath);
@@ -41,9 +36,6 @@ class AppUtils {
     return null;
   }
 
-  // ==========================================
-  // 3. 日期格式化
-  // ==========================================
   /// 格式化为标准日期 (如：2023-10-01)
   static String formatDate(DateTime date) {
     return DateFormat('yyyy-MM-dd').format(date);
@@ -65,9 +57,6 @@ class AppUtils {
     }
   }
 
-  // ==========================================
-  // 4. UI 交互封装 (全局轻提示 Toast)
-  // ==========================================
   static void showToast(BuildContext context, String message, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

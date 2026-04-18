@@ -18,7 +18,6 @@ class TimelineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 依据状态定义视觉颜色
     final bool isCurrent = event.status == EventStatus.current;
     final bool isPast = event.status == EventStatus.past;
 
@@ -29,20 +28,17 @@ class TimelineCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 左侧：时间轴的线与点
           SizedBox(
             width: 40,
             child: Stack(
               alignment: Alignment.center,
               children: [
-                // 垂直线 (首节点无上半段，尾节点无下半段)
                 Column(
                   children: [
                     Expanded(child: Container(width: 2, color: isFirst ? Colors.transparent : lineColor)),
                     Expanded(child: Container(width: 2, color: isLast ? Colors.transparent : lineColor)),
                   ],
                 ),
-                // 节点圆圈
                 Container(
                   width: isCurrent ? 16 : 12,
                   height: isCurrent ? 16 : 12,
@@ -62,10 +58,9 @@ class TimelineCard extends StatelessWidget {
             ),
           ),
 
-          // 右侧：内容卡片
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 20.0), // 卡片之间的间距
+              padding: const EdgeInsets.only(bottom: 20.0),
               child: Container(
                 decoration: BoxDecoration(
                   color: isCurrent ? Colors.white : Colors.grey.shade50,
@@ -82,7 +77,6 @@ class TimelineCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 标题
                     Text(
                       event.title,
                       style: TextStyle(
@@ -93,7 +87,7 @@ class TimelineCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
 
-                    // 描述
+
                     Text(
                       event.description,
                       style: TextStyle(
@@ -102,7 +96,7 @@ class TimelineCard extends StatelessWidget {
                       ),
                     ),
 
-                    // 动态气象或公式贴士 (仅当前高亮阶段或存在时展示)
+
                     if (event.dynamicTip != null && event.dynamicTip!.isNotEmpty && isCurrent) ...[
                       const SizedBox(height: 12),
                       Container(

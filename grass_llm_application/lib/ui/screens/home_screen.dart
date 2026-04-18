@@ -3,12 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-
 import '../../core/constants.dart';
 import '../../providers/user_provider.dart';
 import '../../providers/timeline_provider.dart';
-
-// 引入子组件 (我们将在接下来的步骤中依次生成它们)
 import '../widgets/timeline_card.dart';
 import '../widgets/voice_photo_fab.dart';
 import '../widgets/chat_bottom_sheet.dart';
@@ -24,7 +21,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // 页面构建完成后，立刻驱动时间轴引擎，生成动态卡片并拉取天气
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final profile = context.read<UserProvider>().profile;
       if (profile != null) {
@@ -33,12 +29,11 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // 唤起底部的极简问答弹窗
   void _showChatBottomSheet() {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // 允许全屏高度
-      backgroundColor: Colors.transparent, // 背景透明，由内部组件控制圆角纯白
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (context) => const ChatBottomSheet(),
     );
   }
@@ -52,7 +47,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: AppConstants.backgroundColor,
 
-      // 1. 极简纯白导航栏
       appBar: AppBar(
         title: Column(
           children: [
@@ -66,13 +60,11 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
-      // 2. 主体：动态时间轴瀑布流
       body: timelineProvider.events.isEmpty
           ? const Center(child: CircularProgressIndicator(color: AppConstants.primaryColor))
           : RefreshIndicator(
         color: AppConstants.primaryColor,
         onRefresh: () async {
-          // 下拉刷新，重新推演并拉取最新天气
           if (profile != null) {
             context.read<TimelineProvider>().generateTimeline(profile);
           }
@@ -84,7 +76,6 @@ class _HomeScreenState extends State<HomeScreen> {
             itemCount: timelineProvider.events.length,
             itemBuilder: (BuildContext context, int index) {
               final event = timelineProvider.events[index];
-              // 添加瀑布流交错进场动画
               return AnimationConfiguration.staggeredList(
                 position: index,
                 duration: const Duration(milliseconds: 500),
@@ -104,7 +95,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
-      // 3. 悬浮双摄入口与即用即走弹窗
       floatingActionButton: VoicePhotoFab(
         onOpenChat: _showChatBottomSheet,
       ),

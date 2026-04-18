@@ -4,16 +4,13 @@ import os
 import glob
 from tqdm import tqdm
 
-# 解析 PDF 和 Word
 import pdfplumber
 import docx
-
-# LangChain 组件
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
-# 引入全局配置
+
 from app.core.config import settings
 
 
@@ -42,19 +39,15 @@ def extract_text_from_docx(file_path):
 
 
 def main():
-    print("==================================================")
     print(" 开始构建草业 RAG 本地知识库...")
     print(f" 读取目录: {settings.DOCS_DIR}")
-    print("==================================================")
 
-    # 1. 获取所有的文档文件
     pdf_files = glob.glob(os.path.join(settings.DOCS_DIR, "*.pdf"))
     docx_files = glob.glob(os.path.join(settings.DOCS_DIR, "*.docx"))
     all_files = pdf_files + docx_files
 
     if not all_files:
-        print("❌ 警告：在 docs/ 目录下没有找到任何 PDF 或 Word 文档！")
-        print("请先把您的专业草业资料放进去，再运行此脚本。")
+        print("警告：在 docs/ 目录下没有找到任何 PDF 或 Word 文档！")
         return
 
     # 2. 提取文本
@@ -67,7 +60,7 @@ def main():
             raw_text += extract_text_from_docx(file)
 
     if not raw_text.strip():
-        print("❌ 提取文本为空，请检查文档内容是否全是无法解析的图片。")
+        print("提取文本为空，请检查文档内容是否全是无法解析的图片。")
         return
 
     # 3. 文本切分 (Chunking)
@@ -78,18 +71,16 @@ def main():
         separators=["\n\n", "\n", "。", "！", "？", "，", " ", ""]
     )
     texts = text_splitter.split_text(raw_text)
-    print(f"✅ 共切分为 {len(texts)} 个文本块。")
+    print(f"共切分为 {len(texts)} 个文本块。")
 
-    # 4. 加载 Embedding 模型并存入 Chroma 向量数据库
     print(f"\n正在加载 Embedding 模型 ({settings.EMBEDDING_MODEL_ID})... 初次下载可能需要一两分钟。")
     embeddings = HuggingFaceEmbeddings(
         model_name=settings.EMBEDDING_MODEL_ID,
-        model_kwargs={'device': 'cuda'},  # 使用您的 RTX 4090 极速编码
+        model_kwargs={'device': 'cuda'},
         encode_kwargs={'normalize_embeddings': True}
     )
 
     print("正在生成向量并写入 Chroma 数据库...")
-    # 持久化存储到本地目录
     vector_store = Chroma.from_texts(
         texts=texts,
         embedding=embeddings,
@@ -97,7 +88,7 @@ def main():
     )
     vector_store.persist()
 
-    print(f"\n🎉 知识库构建成功！向量数据已保存在: {settings.VECTOR_STORE_DIR}")
+    print(f"\n知识库构建成功！向量数据已保存在: {settings.VECTOR_STORE_DIR}")
 
 
 if __name__ == "__main__":

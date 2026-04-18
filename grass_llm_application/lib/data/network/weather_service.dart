@@ -3,7 +3,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
-/// 简易天气服务 (基于免鉴权的 Open-Meteo 免费 API)
+/// 简易天气服务，免鉴权的Open-Meteo免费API)
 class WeatherService {
   static final Dio _dio = Dio(
     BaseOptions(
@@ -15,13 +15,11 @@ class WeatherService {
   /// 根据经纬度获取当天的天气概况字符串，用于注入给大模型
   /// 如果没有开启定位或传入空，默认返回一个通用的空字符串，不影响主流程
   static Future<String> getTodayWeatherOverview({double? lat, double? lng}) async {
-    // 如果没有经纬度（比如用户拒绝了定位或尚未实现定位功能），则直接返回空字符串
     if (lat == null || lng == null) {
       return "";
     }
 
     try {
-      // 调用 Open-Meteo 免费气象接口 (获取当天的最高温、最低温和天气代码)
       final String url =
           "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lng&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=1";
 
@@ -44,7 +42,6 @@ class WeatherService {
       debugPrint("获取天气数据失败: $e");
     }
 
-    // 失败时优雅降级，不阻塞主流程
     return "";
   }
 

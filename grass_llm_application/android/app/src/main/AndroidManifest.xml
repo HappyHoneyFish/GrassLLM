@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
-        android:label="牧草大模型"
+        android:label="智牧草业"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
